@@ -38,41 +38,41 @@ int main(int argc, char **argv) {
         i++;
 
         if (jpeg_sign == JSIGN_SOI) {
-            printf("  SOI sign offset: %d\n", i - 2);
+            printf("  SOI sign offset: %lu\n", i - sizeof(jpeg_sign));
             found_sign_count++;
         } else if (jpeg_sign == JSIGN_SOF0) {
-            printf("  SOF0 sign offset: %d\n", i - 2);
+            printf("  SOF0 sign offset: %lu\n", i - sizeof(jpeg_sign));
             found_sign_count++;
         } else if (jpeg_sign == JSIGN_SOF1) {
-            printf("  SOF1 sign offset: %d\n", i - 2);
+            printf("  SOF1 sign offset: %lu\n", i - sizeof(jpeg_sign));
             found_sign_count++;
         } else if (jpeg_sign == JSIGN_SOF2) {
-            printf("  SOF2 sign offset: %d\n", i - 2);
+            printf("  SOF2 sign offset: %lu\n", i - sizeof(jpeg_sign));
             found_sign_count++;
         } else if (jpeg_sign == JSIGN_DHT) {
-            printf("  DHT sign offset: %d\n", i - 2);
+            printf("  DHT sign offset: %lu\n", i - sizeof(jpeg_sign));
             found_sign_count++;
         } else if (jpeg_sign == JSIGNf_DQT) {
-            printf("  DQT sign offset: %d\n", i - 2);
+            printf("  DQT sign offset: %lu\n", i - sizeof(jpeg_sign));
             found_sign_count++;
         } else if (jpeg_sign == JSIGN_DRI) {
-            printf("  DRI sign offset: %d\n", i - 2);
+            printf("  DRI sign offset: %lu\n", i - sizeof(jpeg_sign));
             found_sign_count++;
         } else if (jpeg_sign == JSIGN_SOS) {
-            printf("  SOS sign offset: %d\n", i - 2);
+            printf("  SOS sign offset: %lu\n", i - sizeof(jpeg_sign));
             found_sign_count++;
         } else if (jpeg_sign == JSIGN_COM) {
-            printf("  COM sign offset: %d\n", i - 2);
+            printf("  COM sign offset: %lu\n", i - sizeof(jpeg_sign));
             found_sign_count++;
         } else if (jpeg_sign == JSIGN_EOI) {
-            printf("  EOI sign offset: %d\n", i - 2);
+            printf("  EOI sign offset: %lu\n", i - sizeof(jpeg_sign));
             found_sign_count++;
             break;
         } else if ((jpeg_sign & 0xfff0) == JSIGN_RST) {
-            printf("  RST%d sign offset: %d\n", (jpeg_sign & 0x000f), i - 2);
+            printf("  RST%d sign offset: %lu\n", (jpeg_sign & 0x000f), i - sizeof(jpeg_sign));
             found_sign_count++;
         } else if ((jpeg_sign & 0xfff0) == JSIGN_APP) {
-            printf("  APP%d sign offset: %d\n", (jpeg_sign & 0x000f), i - 2);
+            printf("  APP%d sign offset: %lu\n", (jpeg_sign & 0x000f), i - sizeof(jpeg_sign));
             found_sign_count++;
         }
     }
@@ -89,13 +89,13 @@ int main(int argc, char **argv) {
         zip_sign = (zip_sign << 8) | b;
 
         if (zip_sign == ZSIGN_LFH) {
-            printf("  LFH sign offset: %d\n", i - 4);
+            printf("  LFH sign offset: %lu\n", i - sizeof(zip_sign));
             found_sign_count++;
         } else if (zip_sign == ZSIGN_AEDH) {
-            printf("  AEDH sign offset: %d\n", i - 4);
+            printf("  AEDH sign offset: %lu\n", i - sizeof(zip_sign));
             found_sign_count++;
         } else if (zip_sign == ZSIGN_CDH) {
-            printf("  CDH sign offset: %d\n", i - 4);
+            printf("  CDH sign offset: %lu\n", i - sizeof(zip_sign));
 
             if (fread(&cf_header, sizeof(cf_header), 1, inf)) {
                 i += sizeof(cf_header);
@@ -119,16 +119,16 @@ int main(int argc, char **argv) {
 
             found_sign_count++;
         } else if (zip_sign == ZSIGN_DSR) {
-            printf("  DSR sign offset: %d\n", i - 4);
+            printf("  DSR sign offset: %lu\n", i - sizeof(zip_sign));
             found_sign_count++;
         } else if (zip_sign == ZSIGN_ZIP64_EOCDR) {
-            printf("  ZIP64_EOCDR sign offset: %d\n", i - 4);
+            printf("  ZIP64_EOCDR sign offset: %lu\n", i - sizeof(zip_sign));
             found_sign_count++;
         } else if (zip_sign == ZSIGN_ZIP64_EOCDL) {
-            printf("  ZIP64_EOCDL sign offset: %d\n", i - 4);
+            printf("  ZIP64_EOCDL sign offset: %lu\n", i - sizeof(zip_sign));
             found_sign_count++;
         } else if (zip_sign == ZSIGN_EOCDR) {
-            printf("  EOCDR sign offset: %d\n", i - 4);
+            printf("  EOCDR sign offset: %lu\n", i - sizeof(zip_sign));
             found_sign_count++;
         }
     }
