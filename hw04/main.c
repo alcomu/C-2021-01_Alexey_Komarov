@@ -165,7 +165,6 @@ int main(int argc, char **argv) {
     }
 
     state = GET_LOC_ID;
-
     sprintf(url_str, URL_ID, argv[1]);
     loc_id = curl_req(url_str, state);
 

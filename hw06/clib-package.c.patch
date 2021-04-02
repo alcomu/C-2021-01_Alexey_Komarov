@@ -1,0 +1,11 @@
+--- ./src/common/clib-package.c	2020-09-08 02:51:00.000000000 +0600
++++ clib-package.c	2021-04-02 09:38:16.928832135 +0600
+@@ -663,7 +663,7 @@
+ #endif
+       json = res->data;
+       _debug("status: %d", res->status);
+-      if (!res || !res->ok) {
++      if (!res) {
+         goto download;
+       }
+       log = "fetch";
