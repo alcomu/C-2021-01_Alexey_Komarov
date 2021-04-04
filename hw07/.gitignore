@@ -1,4 +1,4 @@
 # Ignore files
-#fsize_info
-#*.o
-#*.a
+fsize_info
+*.o
+*.a
