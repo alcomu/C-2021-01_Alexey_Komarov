@@ -1,6 +1,9 @@
 {
     "files.associations": {
         "stdio.h": "c",
-        "cstdio": "c"
+        "cstdio": "c",
+        "stat.h": "c",
+        "signal.h": "c",
+        "resource.h": "c"
     }
 }
