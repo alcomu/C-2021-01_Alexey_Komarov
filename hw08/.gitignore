@@ -1,0 +1,4 @@
+# Ignore files
+ftp_serv
+*.o
+*.a
