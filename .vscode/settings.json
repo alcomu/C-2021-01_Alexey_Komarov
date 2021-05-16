@@ -4,6 +4,16 @@
         "cstdio": "c",
         "stat.h": "c",
         "signal.h": "c",
-        "resource.h": "c"
-    }
+        "resource.h": "c",
+        "stdlib.h": "c",
+        "socket.h": "c",
+        "in.h": "c"
+    },
+    "C_Cpp.default.includePath": [
+        "${workspaceFolder}/**",
+        "/usr/lib/x86_64-linux-gnu/glib-2.0/include/",
+        "/usr/include/glib-2.0",
+        "/usr/local/include",
+        "/usr/include"
+    ]
 }

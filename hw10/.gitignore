@@ -1,0 +1,4 @@
+# Ignore files
+logstat
+*.o
+*.pdf

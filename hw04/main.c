@@ -47,6 +47,9 @@ int get_locid_from_json(char *data) {
         fprintf(stderr, "Error: %u:%u: %s\n", jerror.line, jerror.column, jerror.text);
     }
 
+    if (root)
+        json_decref(root);
+
     return res;
 }
 
@@ -110,6 +113,9 @@ void print_weather_from_json(char *data) {
         fprintf(stderr, "This response is not a proper json object.\n");
         fprintf(stderr, "Error: %u:%u: %s\n", jerror.line, jerror.column, jerror.text);
     }
+
+    if (root)
+        json_decref(root);
 }
 
 int curl_req(char *url, int step) {

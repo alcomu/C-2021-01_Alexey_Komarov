@@ -1,0 +1,3 @@
+# Ignore files
+crc32_calc
+*.o
