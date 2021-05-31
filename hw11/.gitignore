@@ -1,0 +1,3 @@
+# Ignore files
+http_serv
+*.o
