@@ -50,7 +50,7 @@ int pgsql_handle(DbConnData *cdata) {
     if (PQstatus(conn) != CONNECTION_OK)
         finish_err_pgsql(conn);
 
-    sprintf(req, "SELECT %s FROM %s;", cdata->colname, cdata->tblname);
+    snprintf(req, REQ_LEN, "SELECT %s FROM %s;", cdata->colname, cdata->tblname);
     PGresult *res = PQexec(conn, req);
     if (PQresultStatus(res) != PGRES_TUPLES_OK)
         finish_err_pgsql(conn);
@@ -113,7 +113,7 @@ int mysql_handle(DbConnData *cdata) {
                             cdata->dbname, atoi(cdata->port), NULL, 0))
         finish_err_mysql(conn);
     
-    sprintf(req, "SELECT %s FROM %s;", cdata->colname, cdata->tblname);
+    snprintf(req, REQ_LEN, "SELECT %s FROM %s;", cdata->colname, cdata->tblname);
     if (mysql_query(conn, req))
         finish_err_mysql(conn);
 
@@ -169,15 +169,14 @@ int main(int argc, char **argv) {
     if (argc == 1) {
         printf("Usage: ./statdb dbtype dbname table column login passwd [host:port]\n");
         exit(0);
-    } else if (argc < 5) {
+    } else if (argc < 7 || argc > 8) {
         fprintf(stderr, "Error arguments count!!!\n");
         exit(1);
     }
 
     dbtype = argv[1]; cdata.dbname = argv[2]; cdata.tblname = argv[3]; cdata.colname = argv[4];
+    cdata.login = argv[5]; cdata.passwd = argv[6];
     if (argc == 8) {
-        cdata.login = argv[5];
-        cdata.passwd = argv[6];
         cdata.host = strtok(argv[7], ":");
         cdata.port = argv[7]+strlen(cdata.host)+1;
     } else {

@@ -34,18 +34,6 @@ typedef struct LogArg_ {
 
 
 
-size_t find_char(char c, const char *str) {
-    size_t i, res = -1;
-
-    for (i = 0; str[i] != '\0'; ++i) {
-        if (str[i] == c) {
-            res = i;
-            break;
-        }
-    }
-
-    return res;
-}
 
 gint comp_tx_bytes(gconstpointer a, gconstpointer b) {
     const AccStatUnit *asu_a = *((AccStatUnit **)a);
@@ -99,10 +87,12 @@ void *parse_func(void *arg) {
     size_t it;
     FILE *f;
     char str[STR_LEN];
-    size_t i, j;
+    size_t i, j, k;
     AccStatUnit *asu, *asu1;
 
     for (it=0; it<larg->lstats_size; ++it) {
+        k = 10;
+
         lstat = &larg->lstats[it];
         if (lstat->ptid != larg->ptid) continue;  // Check ptid
 
@@ -113,52 +103,51 @@ void *parse_func(void *arg) {
         if (!f) {
             fprintf(stderr, "Error read log file %s!!!\n", lstat->fname);
         } else {
-            while (fgets(str, STR_LEN, f)) {
-                if (strncmp(str, "", 1) == 0)
+            while (fgets(str, STR_LEN, f) && k--) {
+                if (!*str)
                     continue;
 
-                char strtmp[STR_LEN];
-                char url[STR_LEN];
-                char referer[STR_LEN];
+                char strtmp[STR_LEN] = {0};
+                char url[STR_LEN] = {0};
+                char referer[STR_LEN] = {0};
                 unsigned long tx_bytes = 0;
-                size_t pos = 0, pos1 = 0;
-                size_t len = 0, len1 = 0;
+                size_t len = 0;
+                char *fc , *fc1;
 
-                memset(url, 0, STR_LEN);
-                memset(referer, 0, STR_LEN);
-                memset(strtmp, 0, STR_LEN);
+                // printf("str: %s", str);
 
-                pos = find_char('"', str);
-                len = find_char('"', str+pos+1);
-                strncpy(strtmp, str+pos+1, len);
+                fc = strchr(str, '"')+1;
+                len = strchr(fc+1, '"')-fc;
+                strncpy(strtmp, fc, len);
+                fc += len;
                 // printf("req: %s\n", strtmp);
 
-                pos1 = find_char(' ', strtmp);
-                if (pos1 < strlen(strtmp)-1) {
-                    pos1 = find_char(' ', strtmp+pos1+1);
-                    if (pos1 < strlen(strtmp)-1) {
-                        pos1 = find_char(' ', strtmp);
-                        len1 = find_char(' ', strtmp+pos1+1);
-                        strncpy(url, strtmp+pos1+1, len1);
+                fc1 = strchr(strtmp, ' ');
+                if (fc1 != NULL) {
+                    fc1 = strchr(fc1+1, ' ');
+                    if (fc1 != NULL) {
+                        fc1 = strchr(strtmp, ' ')+1;
+                        len = strchr(fc1+1, ' ')-fc1;
+                        strncpy(url, fc1, len);
                     }
                 }
                 // printf("url: %s\n", url);
 
-                pos += len + 3;
-                pos += find_char(' ', str+pos) + 1;
-                len = find_char(' ', str+pos);
+                fc = strchr(fc, ' ')+1;
+                fc = strchr(fc, ' ')+1;
+                len = strchr(fc+1, ' ')-fc;
                 memset(strtmp, 0, STR_LEN);
-                strncpy(strtmp, str+pos, len);
+                strncpy(strtmp, fc, len);
+                fc += len;
                 tx_bytes = atol(strtmp);
-                // printf("tx_bytes: %d\n", tx_bytes);
+                // printf("tx_bytes: %ld\n", tx_bytes);
                 
                 lstat->tx_bytes += tx_bytes;
 
-                pos += len + 1;
-                pos += find_char('"', str+pos) + 1;
-                len = find_char('"', str+pos);
-                strncpy(referer, str+pos, len);
-                // printf("referer: [%s]\n", referer);
+                fc = strchr(fc, '"')+1;
+                len = strchr(fc+1, '"')-fc;
+                strncpy(referer, fc, len);
+                // printf("referer: [%s]\n\n", referer);
 
                 g_ptr_array_add(stat_arr, acc_stat_unit_new(url, referer, tx_bytes, 1));
             }
@@ -220,9 +209,10 @@ int main(int argc, char **argv) {
     struct dirent *entry;
     size_t i, j, thcount;
     AccStatUnit *asu, *asu1;
+    size_t tx_bytes_sum = 0;
 
     if (argc == 1) {
-        printf("Usage: ./logstat loggir threads\n");
+        printf("Usage: ./logstat logdir threads\n");
         exit(0);
     } else if (argc != 3) {
         fprintf(stderr, "Error arguments count!!!\n");
@@ -303,6 +293,14 @@ int main(int argc, char **argv) {
             g_ptr_array_add(refs_stat_arr, acc_stat_unit_new(asu->url, asu->ref, asu->tx_bytes, asu->count));
             printf("  %ld %s\n", asu->count, asu->ref);
         }
+
+        printf("\n---------------------------------------------------------------------");
+        printf("\n          Transmit bytes %s\n", lstats[i].fname);
+        printf("---------------------------------------------------------------------\n");
+        printf("  %ld\n", lstats[i].tx_bytes); 
+
+        // Get summaru transmit bytes
+        tx_bytes_sum += lstats[i].tx_bytes;
     }
 
     // Show summary stat
@@ -355,6 +353,11 @@ int main(int argc, char **argv) {
             if (!--i) break;
         }
     }
+
+    printf("\n---------------------------------------------------------------------");
+    printf("\n          Transmit bytes summary %s\n", lstats[i].fname);
+    printf("---------------------------------------------------------------------\n");
+    printf("  %ld\n", tx_bytes_sum); 
 
 
     // Free resource

@@ -94,6 +94,7 @@ int main(int argc, char **argv) {
                         
                         parse_comm(buffer, cmd);
                         state->conn = cli_fd;
+                        state->sock_pasv = NULL;
                                                                         
                         response(cmd, state);
                         

@@ -71,6 +71,7 @@ int create_socket(int port) {
     struct sockaddr_in serv_addr;
  
     inet_pton(AF_INET, "0.0.0.0", &serv_addr.sin_addr);
+    serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(port);
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -182,8 +183,8 @@ void ftp_pasv(State *state) {
     gen_port(port);
     get_ip(state->conn, ip);
 
-    // Close previous passive socket?
-    close(state->sock_pasv);
+    if (state->sock_pasv != NULL)
+        close(state->sock_pasv);
 
     // Start listening here, but don't accept the connection
     state->sock_pasv = create_socket((256 * port->p1) + port->p2);

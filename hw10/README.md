@@ -1,3 +1,3 @@
 # logstat
 
-Комманда запуска: ./logstat threads
+Комманда запуска: ./logstat logdir threads
