@@ -24,7 +24,7 @@ typedef struct ServArg_ {
 
 
 static void epoll_ctl_add(int epfd, int fd, uint32_t events) {
-	struct epoll_event ev;
+	struct epoll_event ev = {0};
 	ev.events = events;
     ev.data.fd = fd;
 
@@ -111,9 +111,15 @@ int main(int argc, char **argv) {
     inet_pton(AF_INET, host, &serv_addr.sin_addr);
     serv_addr.sin_port = htons(port);
     
-    bind(serv_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+    if (bind(serv_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) != 0) {
+        fprintf(stderr, "Error bind serv socket!!!\n");
+        exit(1);
+    }
     setnonblocking(serv_fd);
-    listen(serv_fd, 256);
+    if (listen(serv_fd, 256) != 0) {
+        fprintf(stderr, "Error listen serv socket!!!\n");
+        exit(1);
+    }
 
     for (i=0; i<th_count; ++i) {
         sargs[i].serv_fd = serv_fd;

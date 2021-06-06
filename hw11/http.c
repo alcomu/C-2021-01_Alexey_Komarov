@@ -24,6 +24,8 @@ const char *HTTP_ERR_404 = "HTTP/1.0 404 Not Found\r\nContent-Type: text/html\r\
 const char *HTTP_ERR_403 = "HTTP/1.0 403 Forbidden\r\nContent-Type: text/html\r\nContent-length: 106\r\n\r\n"
 	"<html><head><title>Error</title></head><body><hr><h1>No permission.</h1><hr><p>http_serv</p></body></html>";
 
+const char *HTTP_OK  = "HTTP/1.0 200 OK\r\n";
+
 enum file_errs {
     NOT_EXISTING = -1,
     FILE_IS_DIR = -2,
@@ -40,8 +42,14 @@ size_t file_attr(char *fname) {
 
 	if (strstr(fname, "..") != NULL || fname[0]=='/') return FILE_NO_PERM;
 	if (stat(fname, &info) == -1) return NOT_EXISTING;
-	if (!(info.st_mode & S_IRUSR)) return FILE_NO_PERM;
 	if (S_ISDIR(info.st_mode)) return FILE_IS_DIR;
+	if (info.st_uid == getuid()) {
+		if (!(info.st_mode & S_IRUSR)) return FILE_NO_PERM;
+	} else if (info.st_gid == getgid()) {
+		if (!(info.st_mode & S_IRGRP)) return FILE_NO_PERM;
+	} else if (!(info.st_mode & S_IROTH)) {
+		return FILE_NO_PERM;
+	}
 
 	return info.st_size;
 }
@@ -63,7 +71,8 @@ char *get_content_type(char *fname) {
         }
 	}
 
-	return NULL;
+	// Default mime type
+	return "application/octet-stream";
 }
 
 size_t recv_line(int fd, char *buf, size_t len) {
@@ -99,8 +108,9 @@ int parse_head_line(const char *src, char *method, char *filepath){
 int http_req(int fd) {
 	char buf[HTTP_BUF_SIZE] = "\0", request[8] = "\0", url[256] = "\0";
 	char *fname, *content_type;
-	size_t len, file_size;
-	FILE *f;
+	size_t file_size;
+	int f;
+	off_t off = 0;
 
 
 	if (recv_line(fd, buf, (sizeof(buf)-1)) <= 3) {
@@ -142,33 +152,24 @@ int http_req(int fd) {
 		return 0;
 	}
 
-	f = fopen(fname, "r");
-	if (f == NULL) {
+	if ((f = open(fname, O_RDONLY)) < 0) {
 		write(fd, HTTP_ERR_404, strlen(HTTP_ERR_404));
 		return 0;
 	}
 
-	write(fd, "HTTP/1.0 200 OK\r\n", 17);
+	write(fd, HTTP_OK, strlen(HTTP_OK));
 
 	// Add content information
 	content_type = get_content_type(fname);
-	if (content_type != NULL) {
-		sprintf(buf, "Content-type: %s\r\n", content_type);
-		write(fd, buf, strlen(buf));
-	} else {
-		fprintf(stderr, "No match for file extension `%s`.\n >Sending response without Content-type\n", fname);
-	}
-
+	sprintf(buf, "Content-type: %s\r\n", content_type);
+	write(fd, buf, strlen(buf));
+	
 	sprintf(buf, "Content-length: %ld\r\nServer: http_serv\r\n\r\n", file_size);
 	write(fd, buf, strlen(buf));
 
-    while (!feof(f)) {
-        len = fread(buf, 1, HTTP_BUF_SIZE, f);
-        if (len)
-            write(fd, buf, len);
-    }
+	sendfile(fd, f, &off, file_size);
 
-	fclose(f);
+	close(f);
 
 	return 0;
 }
