@@ -32,11 +32,11 @@ void drawBox(void) {
         glNormal3fv(&n[i][0]);
         glTexCoord2f(1.0, 0.0);
         glVertex3fv(&v[faces[i][0]][0]);
-        glTexCoord2f(0.0, 1.0);
-        glVertex3fv(&v[faces[i][1]][0]);
-        glTexCoord2f(0.0, 0.0);
-        glVertex3fv(&v[faces[i][2]][0]);
         glTexCoord2f(1.0, 1.0);
+        glVertex3fv(&v[faces[i][1]][0]);
+        glTexCoord2f(0.0, 1.0);
+        glVertex3fv(&v[faces[i][2]][0]);
+        glTexCoord2f(0.0, 0.0);
         glVertex3fv(&v[faces[i][3]][0]);
         glEnd();
     }
@@ -73,8 +73,8 @@ GLuint load_texture(const char *filename) {
 
     if (file == NULL)
         return 0;
-    width = 1024;
-    height = 512;
+    width = 1000;
+    height = 1000;
     data = (unsigned char *)malloc(width * height * 3);
     fread(data, width * height * 3, 1, file);
     fclose(file);
