@@ -1,0 +1,3 @@
+/home/alex/work/otus/c_developer/C-2021-01_Alexey_Komarov/hw14/CMakeFiles/rebuild_cache.dir
+/home/alex/work/otus/c_developer/C-2021-01_Alexey_Komarov/hw14/CMakeFiles/edit_cache.dir
+/home/alex/work/otus/c_developer/C-2021-01_Alexey_Komarov/hw14/CMakeFiles/pingpong.dir
