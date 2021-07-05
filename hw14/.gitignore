@@ -1,3 +1,4 @@
 # Ignore files
+CMakeFiles
 pingpong
 *.o
