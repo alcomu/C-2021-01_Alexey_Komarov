@@ -15,10 +15,6 @@ extern char cfg_b_install_comm[STR_LEN];
 extern char cfg_b_clean_comm[STR_LEN];
 
 
-
-
-
-
 extern void read_conf();
 void prep_remote_comm(const char *c);
 void run_remote_comm(const char *c);
@@ -28,7 +24,6 @@ void clear_tmp_files();
 void build_handler();
 void install_handler();
 void clean_handler();
-
 
 void prep_remote_comm(const char *c) {
     char comm[COMM_SIZE];
@@ -44,8 +39,8 @@ void run_remote_comm(const char *c) {
     system(comm);
 }
 
-void prepare_local_files() {
-    system("tar -cf temp.tar ./*");
+void prepare_local_files() { 
+    system("tar -cf temp.tar ./*"); 
 }
 
 void prepare_remote_files() {
@@ -77,7 +72,7 @@ void build_handler() {
     prepare_local_files();
     printf("<<< Prepare remote files >>>\n");
     prepare_remote_files();
-    
+
     if (strlen(cfg_b_dependences)) {
         printf("<<< Run install dependences >>>\n");
         run_remote_comm(cfg_b_dependences);
@@ -85,7 +80,6 @@ void build_handler() {
 
     if (strlen(cfg_b_build_comm)) {
         printf("<<< Run build commands >>>\n");
-        printf("Dep commands: %s\n", cfg_b_dependences);
         run_remote_comm(cfg_b_build_comm);
     }
 
@@ -100,7 +94,7 @@ void install_handler() {
         printf("<<< Run install commands >>>\n");
         run_remote_comm(cfg_b_install_comm);
     }
-    
+
     printf("<<< Done >>>\n");
 }
 
@@ -138,7 +132,7 @@ int main(int argc, char **argv) {
     else if (!strncmp(argv[1], "clean", strlen("clean")))
         clean_handler();
     else
-        printf("<<< Not found role >>>\n");
+        printf("Not found %s role !!!\n", argv[1]);
 
     return 0;
 }

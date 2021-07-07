@@ -1,5 +1,5 @@
-#include "toml.h"
 #include "common.h"
+#include "toml.h"
 
 
 #define CONFIG_FILE "rbuilder.conf"
@@ -12,8 +12,6 @@ char cfg_b_dependences[STR_LEN] = "";
 char cfg_b_build_comm[STR_LEN] = "";
 char cfg_b_install_comm[STR_LEN] = "";
 char cfg_b_clean_comm[STR_LEN] = "";
-
-
 
 
 void read_conf() {
@@ -68,12 +66,14 @@ void read_conf() {
         if (dep_array) {
             for (int i = 0;; i++) {
                 toml_datum_t dep = toml_string_at(dep_array, i);
-                if (!dep.ok) break;
+                if (!dep.ok)
+                    break;
                 char str[STR_LEN];
                 // Prepare install dependences command
-                snprintf(str, STR_LEN, 
-                    "if [ \\$(dpkg -s %s | egrep 'Status:.*installed' | wc -l) -eq 0 ]; then apt-get install -y %s; fi;", 
-                    dep.u.s, dep.u.s);
+                snprintf(str, STR_LEN,
+                         "if [ \\$(dpkg -s %s | egrep 'Status:.*installed' | wc -l) -eq 0 ]; then "
+                         "apt-get install -y %s; fi;",
+                         dep.u.s, dep.u.s);
                 strncat(cfg_b_dependences, str, strlen(str));
                 free(dep.u.s);
             }
@@ -83,7 +83,8 @@ void read_conf() {
         if (build_array) {
             for (int i = 0;; i++) {
                 toml_datum_t comm = toml_string_at(build_array, i);
-                if (!comm.ok) break;
+                if (!comm.ok)
+                    break;
                 strncat(cfg_b_build_comm, comm.u.s, strlen(comm.u.s));
                 strncat(cfg_b_build_comm, "; ", (int)sizeof("; "));
                 free(comm.u.s);
